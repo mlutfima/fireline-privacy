@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c2843">
+<meta name="description" content="AquaSphere — public aquaponics monitoring dashboard. Manual records now; live ThingSpeak sensor feed when connected.">
+<title>AquaSphere | Smart Aquaponics</title>
+<style>
+:root{--sky:#e9f7ff;--navy:#09243b;--blue:#146ab1;--aqua:#22b9c5;--grass:#38a36b;--leaf:#17694b;--yellow:#ffd35b;--paper:#ffffff;--mute:#527187;--line:#c6e5ef;--danger:#a83c39;--warning:#925a10}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:linear-gradient(#caedff 0,#e7f8fc 290px,#f5fbfc 100%);color:var(--navy)}a{color:#096c9e}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffbe41;outline-offset:2px}
+header{background:linear-gradient(120deg,#0a365e,#09758b);color:white;position:relative;overflow:hidden}.hero{max-width:1080px;margin:auto;padding:38px 20px 58px;position:relative;z-index:1}.hero:after{content:"";position:absolute;bottom:-32px;right:50px;width:125px;height:125px;border:13px solid #36b170;border-radius:20px 20px 0 0;opacity:.22;transform:rotate(-22deg)}.eyebrow{font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:#c2f8e2;font-weight:750}.brand{display:flex;gap:12px;align-items:center}.brand-icon{display:grid;place-items:center;background:#ffffff20;border:2px solid #9af7e3;border-radius:18px;width:56px;height:56px;font-size:28px}.hero h1{margin:8px 0 5px;font-size:clamp(2.4rem,6.8vw,4.4rem);letter-spacing:-.05em;line-height:1.04}.hero p{margin:9px 0;max-width:690px;color:#e0f5fa}.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}.tag{display:inline-flex;align-items:center;gap:6px;background:#ffffff22;border:1px solid #80cddb;color:white;padding:7px 11px;border-radius:40px;font-size:.82rem;font-weight:650}
+.cloud{position:absolute;background:#ffffff27;border-radius:40px;height:35px;width:120px;top:28px;right:7%}.cloud:before{content:"";position:absolute;border-radius:50%;width:55px;height:55px;background:#ffffff27;left:28px;top:-22px}.cloud.second{top:148px;right:24%;transform:scale(.55)}
+main{max-width:1080px;margin:-23px auto 60px;padding:0 16px;position:relative}.panel{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 8px 30px #0d5d7910;margin-bottom:16px}.intro{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:center}.status{display:flex;align-items:center;gap:9px;background:#e8f1f5;border-radius:30px;padding:9px 15px;font-size:.84rem;font-weight:700;color:#375e75}.dot{height:9px;width:9px;border-radius:50%;background:#8b9ba5}.dot.good{background:#0eaa78}.dot.bad{background:#df8150}.lead{font-size:1.1rem;font-weight:800;margin:0 0 6px}.small{color:var(--mute);font-size:.86rem;line-height:1.5}.mode-tabs{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #b8dbe8;border-radius:12px;background:white;color:var(--navy);padding:10px 16px;font-weight:750;min-height:43px}.btn:hover{background:#ecf8fc}.btn.primary,.btn.active{background:#075d8c;color:white;border-color:#075d8c}.btn.green{background:#167a5c;border-color:#167a5c;color:white}.btn:disabled{opacity:.4;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.metric{background:linear-gradient(155deg,#f8fdff,#eaf7fa);border:1px solid #cfe8ed;border-radius:17px;padding:17px;min-width:0}.metric .label{font-size:.81rem;color:#42657a;font-weight:700}.metric strong{display:block;font-size:clamp(1.5rem,3vw,2.5rem);line-height:1.3;margin:5px 0}.metric small{color:#5f7f8e}.metric .unit{font-size:.95rem;color:#52728a;font-weight:650}.goodtext{color:var(--leaf)!important}.badtext{color:var(--danger)!important}.warningtext{color:var(--warning)!important}.sectionhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 15px}.sectionhead h2{font-size:1.15rem;letter-spacing:-.02em;margin:0}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.field label{display:block;font-size:.83rem;font-weight:700;margin-bottom:6px;color:#31546a}.field input{width:100%;min-height:43px;border:1px solid #badbe3;border-radius:11px;padding:9px 12px;background:#fbfeff}.help{font-size:.78rem;color:#648197;margin:7px 0 0}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.alert{border-left:4px solid #e5ad44;background:#fff8e7;border-radius:7px;padding:10px 12px;margin:7px 0;font-size:.84rem;color:#6f4f1f}.alert.ok{border-color:#44a789;background:#eefcf6;color:#29654e}.alert.off{border-color:#b9d4dc;background:#f1f8fb;color:#4e6a7e}.split{display:grid;grid-template-columns:1.65fr 1fr;gap:16px}.chartbox{overflow:hidden;background:#f5fcff;border:1px solid #d8eef4;border-radius:13px;padding:10px}.chartbox svg{display:block;width:100%;height:auto}.empty{padding:32px;text-align:center;color:#668394}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e4eef2}.row:last-child{border:0}.pill{border-radius:30px;background:#e2f4f1;padding:5px 10px;font-size:.78rem;font-weight:750}.pill.dim{background:#edf4f6;color:#67808d}.note{border:1px dashed #8dbdd2;border-radius:12px;padding:12px;background:#f3fbff;color:#315e74;font-size:.86rem;line-height:1.5}
+hr{border:0;border-top:1px solid #e1edf2;margin:18px 0}.foot{text-align:center;color:#5b7b8d;font-size:.82rem;padding:0 18px 40px}.qrarea{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}.qrarea img{width:166px;height:166px;border:1px solid #ddd;border-radius:12px;padding:5px}.urlbox{overflow-wrap:anywhere;font-size:.85rem;color:#075d8c}.hidden{display:none!important}.banner{border-left:4px solid #169a7e;background:#edfdf5;padding:12px 16px;border-radius:8px;color:#275a49;font-size:.87rem}.livebanner{border-left-color:#1694ba;background:#edf8ff;color:#28526a}.chip{display:inline-block;border-radius:7px;background:#ffe9a5;color:#654509;padding:3px 7px;font-size:.76rem;font-weight:800}
+@media(max-width:710px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.split{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.qrarea{grid-template-columns:1fr}.panel{padding:18px}.hero{padding-top:30px}}
+@media(max-width:390px){.grid{grid-template-columns:1fr 1fr;gap:8px}.metric{padding:12px}.metric strong{font-size:1.55rem}.formgrid{grid-template-columns:1fr}.hero-tags{gap:5px}.tag{font-size:.74rem}.btn{padding:9px 11px}}
+</style>
+</head>
+<body>
+<header><div class="cloud"></div><div class="cloud second"></div><div class="hero">
+<div class="eyebrow">AQUASPHERE INNOVATOR • AQUAPONICS</div>
+<div class="brand"><div class="brand-icon" aria-hidden="true">🐟</div><h1>AquaSphere</h1></div>
+<p>Smart Aquaponics Monitoring • See your fish tank, plant environment and system status in one place.</p>
+<div class="hero-tags"><span class="tag">🌡️ Temperature</span><span class="tag">🧪 pH</span><span class="tag">💧 Water level</span><span class="tag">🌱 Grow light</span><span class="tag">🐠 Feeding</span></div>
+</div></header>
+<main>
+<section class="panel intro"><div><p class="lead">My Aquaponics Dashboard</p><div class="small" id="sourceCaption">No sensor connected — manual entries only.</div></div><div class="status" aria-live="polite"><span class="dot" id="connectionDot"></span><span id="connectionText">Not connected to sensors</span></div></section>
+<section class="panel"><div class="sectionhead"><h2>Choose your monitoring source</h2><span class="small">No invented or sample readings</span></div>
+<div class="mode-tabs"><button class="btn active" type="button" id="manualModeBtn">✍️ Manual measurements</button><button class="btn" type="button" id="cloudModeBtn">📡 Live sensor channel</button></div>
+<div id="manualInfo" class="banner" style="margin-top:14px"><strong>Real manual measurements:</strong> record values from a thermometer or water test kit. They are saved on this device only.</div>
+<div id="cloudConfig" class="hidden" style="margin-top:14px">
+<div class="banner livebanner"><strong>Live monitoring:</strong> connect a public ThingSpeak channel receiving real measurements from installed sensors. This screen cannot create measurements without hardware.</div>
+<div class="formgrid" style="margin-top:14px">
+<div class="field"><label for="channelId">Public ThingSpeak Channel ID</label><input id="channelId" inputmode="numeric" pattern="[0-9]*" placeholder="e.g. 1234567" maxlength="12"></div>
+<div class="field"><label for="pollRate">Refresh interval</label><input id="pollRate" value="30 seconds" disabled></div>
+</div><p class="help">Field 1 = temperature (°C), 2 = pH, 3 = water level (%), 4 = pump (0/1), 5 = light (0/1), 6 = feeder count. Use a PUBLIC channel only; never paste API keys here.</p>
+<div class="actions"><button class="btn primary" type="button" id="connectBtn">Connect public channel</button><button class="btn" type="button" id="refreshBtn">Refresh now</button><button class="btn" type="button" id="disconnectBtn">Disconnect</button></div><p class="small" id="liveMessage" aria-live="polite"></p>
+</div></section>
+<section class="panel"><div class="sectionhead"><h2>🌊 Water & system readings</h2><span class="chip" id="provenanceChip">AWAITING MANUAL DATA</span></div>
+<div class="grid">
+<div class="metric"><div class="label">🌡️ Water temperature</div><strong><span id="tempVal">—</span> <span class="unit">°C</span></strong><small id="tempHint">No reading</small></div>
+<div class="metric"><div class="label">🧪 Water pH</div><strong id="phVal">—</strong><small id="phHint">No reading</small></div>
+<div class="metric"><div class="label">💧 Water level</div><strong><span id="levelVal">—</span> <span class="unit">%</span></strong><small id="levelHint">No reading</small></div>
+<div class="metric"><div class="label">⚙️ Pump status</div><strong id="pumpVal">—</strong><small id="pumpHint">Awaiting telemetry</small></div>
+<div class="metric"><div class="label">💡 Grow light</div><strong id="lightVal">—</strong><small id="lightHint">Awaiting telemetry</small></div>
+<div class="metric"><div class="label">🐠 Fish feeder</div><strong id="feederVal">—</strong><small id="feederHint">Awaiting telemetry</small></div>
+</div><p class="small" id="readingTime">No measurement received yet.</p>
+<div id="alerts" aria-live="polite"><div class="alert off">Add measurements or connect a real public sensor channel to see alerts.</div></div>
+<p class="small">Alert limits below are editable project settings, not proof that the water is safe for a particular fish species. Test ammonia and nitrite separately.</p>
+</section>
+<div class="split">
+<section class="panel" id="manualPanel"><div class="sectionhead"><h2>✍️ Add a real measurement</h2></div>
+<form id="entryForm"><div class="formgrid">
+<div class="field"><label for="tempInput">Temperature (°C)</label><input id="tempInput" type="number" step=".1" min="-5" max="60" placeholder="Read thermometer"></div>
+<div class="field"><label for="phInput">pH (0–14)</label><input id="phInput" type="number" step=".01" min="0" max="14" placeholder="Read pH test"></div>
+<div class="field"><label for="levelInput">Water level (%)</label><input id="levelInput" type="number" step="1" min="0" max="100" placeholder="0–100"></div>
+<div class="field"><label for="ammoInput">Ammonia (mg/L)</label><input id="ammoInput" type="number" step=".01" min="0" max="100" placeholder="Optional test kit"></div>
+<div class="field"><label for="nitriteInput">Nitrite (mg/L)</label><input id="nitriteInput" type="number" step=".01" min="0" max="100" placeholder="Optional test kit"></div>
+</div><div class="actions"><button class="btn primary" type="submit">Save measurement</button><button class="btn" id="exportBtn" type="button">⬇ Export CSV</button></div><p class="small" id="saveMessage" aria-live="polite"></p></form>
+<hr><h3 style="font-size:1rem;margin:0 0 8px">Care activity log</h3><p class="small">These buttons record your actions only. They do NOT activate physical equipment.</p>
+<div class="actions"><button class="btn green" id="fedBtn" type="button">🐟 I fed the fish</button><button class="btn" id="lightOnBtn" type="button">💡 Log light ON</button><button class="btn" id="lightOffBtn" type="button">🌙 Log light OFF</button></div>
+<p id="activitySummary" class="small">No care activities recorded on this device.</p>
+</section>
+<section class="panel"><div class="sectionhead"><h2>🎛️ Monitoring limits</h2></div>
+<div class="formgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+<div class="field"><label for="minTemp">Min °C</label><input id="minTemp" type="number" value="20" step=".5"></div>
+<div class="field"><label for="maxTemp">Max °C</label><input id="maxTemp" type="number" value="30" step=".5"></div>
+<div class="field"><label for="minPh">Min pH</label><input id="minPh" type="number" value="6" min="0" max="14" step=".1"></div>
+<div class="field"><label for="maxPh">Max pH</label><input id="maxPh" type="number" value="8" min="0" max="14" step=".1"></div>
+<div class="field"><label for="minLevel">Low level %</label><input id="minLevel" type="number" value="20" min="0" max="100" step="1"></div>
+</div><div class="actions"><button class="btn" id="saveLimits" type="button">Save alert limits</button></div><p class="small" id="limitsMessage" aria-live="polite"></p>
+<hr><h3 style="font-size:1rem">✅ What is actually connected?</h3>
+<p class="small">This app reads real cloud data ONLY when you configure a sensor-backed public ThingSpeak channel. Manual values are real only if entered from real measurements. Pump, light and feeder telemetry require connected controllers.</p>
+</section>
+</div>
+<section class="panel"><div class="sectionhead"><h2>📈 Temperature history</h2><span class="small">Most recent measurements</span></div><div id="chart" class="chartbox"><div class="empty">No data to graph yet.</div></div></section>
+<section class="panel"><div class="sectionhead"><h2>📲 Scan to open AquaSphere</h2><span class="small">Public web app</span></div><div class="qrarea"><img id="qrImage" alt="QR code that opens the public AquaSphere monitoring page" loading="lazy"><div><p>Share this QR with teachers and judges. It opens the same dashboard on another phone. <strong>Manual measurements stay on the original device</strong>; shared sensor readings are visible only after the public sensor channel is configured.</p><div class="urlbox" id="shareUrl"></div><div class="actions"><button class="btn primary" type="button" id="copyLink">Copy app link</button><button class="btn" type="button" id="openLink">Open shared view</button></div><p class="small" id="shareMessage" aria-live="polite"></p></div></div></section>
+<section class="panel"><div class="sectionhead"><h2>🔐 Safety & transparency</h2></div><div class="note"><strong>No simulated live readings.</strong> This static website does not store readings on a shared server. Manual records and channel settings stay in your browser. A public ThingSpeak channel, if connected, exposes that channel's telemetry to everyone with access. Do not put Wi-Fi passwords or API WRITE keys in this page. App controls are logs, not remote physical control. Automatic fish feeding and grow light actuation require a separate secure device integration.</div>
+<div class="actions"><button class="btn" type="button" id="clearData">Delete local manual records</button></div></section>
+</main><footer class="foot">AquaSphere • AQUASPHERE INNOVATOR • Sustainable learning, real evidence.<br>Original retro-inspired visual design. Not affiliated with Nintendo or any video-game publisher.</footer>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const KEY="aquasphere-v1";
+const defaultLimits={minTemp:20,maxTemp:30,minPh:6,maxPh:8,minLevel:20};
+let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){saved={}}
+let state={mode:saved.mode==="live"?"live":"manual",channel:String(saved.channel||""),manual:Array.isArray(saved.manual)?saved.manual.slice(-300):[],activities:Array.isArray(saved.activities)?saved.activities.slice(-100):[],limits:{...defaultLimits,...(saved.limits||{})}};
+let cloudFeed=[],sensorError="",pollTimer=null,loading=false;
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));return true}catch(e){return false}}
+function num(v,min,max){if(v===null||v===undefined||String(v).trim()==="")return null;const x=Number(v);return Number.isFinite(x)&&x>=min&&x<=max?x:null}
+function fresh(iso){const t=Date.parse(iso);return Number.isFinite(t)&&Date.now()-t>=0&&Date.now()-t<=300000}
+function switchStatus(v){return String(v)==="1"?"ON":String(v)==="0"?"OFF":"—"}
+function fmt(iso){const d=new Date(iso);return Number.isFinite(d.getTime())?d.toLocaleString():"Unknown time"}
+function decimals(v,n){return v===null?"—":Number(v).toFixed(n)}
+function manualList(){return state.manual.filter(x=>x&&x.at&&[x.temp,x.ph,x.level,x.ammo,x.nitrite].some(v=>v!==null)).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at))}
+function currentList(){return state.mode==="live"?cloudFeed:manualList()}
+function cloudEntry(e){return {at:e.created_at,temp:num(e.field1,-5,60),ph:num(e.field2,0,14),level:num(e.field3,0,100),pump:switchStatus(e.field4),light:switchStatus(e.field5),feedCount:num(e.field6,0,10000000)}}
+function updateMode(){
+$("manualModeBtn").classList.toggle("active",state.mode==="manual");$("cloudModeBtn").classList.toggle("active",state.mode==="live");
+$("manualInfo").classList.toggle("hidden",state.mode!=="manual");$("cloudConfig").classList.toggle("hidden",state.mode!=="live");
+$("manualPanel").querySelector("form").style.opacity=state.mode==="live"?"0.7":"1";
+$("channelId").value=state.channel;$("sourceCaption").textContent=state.mode==="live"?"Live channel mode — public ThingSpeak telemetry only.":"Manual mode — saved on this device only.";
+if(state.mode==="manual"){$("liveMessage").textContent="";if(pollTimer){clearInterval(pollTimer);pollTimer=null}}
+updateAll();updateQR();
+}
+function renderAlerts(entry,stale){
+const a=$("alerts");a.replaceChildren();
+function add(msg,kind){const e=document.createElement("div");e.className="alert "+(kind||"");e.textContent=msg;a.appendChild(e)}
+if(!entry){add("No measurements available. Connect sensors or save real manual measurements.","off");return}
+if(stale){add("Sensor data is old or has not refreshed recently. Check the ESP32 and Wi-Fi.","");return}
+let warnings=0;let lim=state.limits;
+if(entry.temp!==null&&(entry.temp<lim.minTemp||entry.temp>lim.maxTemp)){add("Temperature is outside the configured range ("+lim.minTemp+"–"+lim.maxTemp+" °C).");warnings++}
+if(entry.ph!==null&&(entry.ph<lim.minPh||entry.ph>lim.maxPh)){add("pH is outside the configured range ("+lim.minPh+"–"+lim.maxPh+").");warnings++}
+if(entry.level!==null&&entry.level<lim.minLevel){add("Water level is below the configured warning threshold ("+lim.minLevel+"%).");warnings++}
+if(!warnings)add("No threshold alerts from the measurements available. This does not establish fish-water safety.","ok");
+}
+function updateAll(){
+const arr=currentList(),entry=arr.length?arr[arr.length-1]:null,stale=state.mode==="live"&&entry&&!fresh(entry.at);
+$("tempVal").textContent=entry?decimals(entry.temp,1):"—";$("phVal").textContent=entry?decimals(entry.ph,2):"—";$("levelVal").textContent=entry?decimals(entry.level,0):"—";
+$("tempHint").textContent=entry&&entry.temp!==null?"Recorded value":"No reading";$("phHint").textContent=entry&&entry.ph!==null?"Recorded value":"No reading";$("levelHint").textContent=entry&&entry.level!==null?"Recorded value":"No reading";
+$("pumpVal").textContent=state.mode==="live"&&entry?entry.pump:"—";$("lightVal").textContent=state.mode==="live"&&entry?entry.light:"—";
+$("feederVal").textContent=state.mode==="live"&&entry&&entry.feedCount!==null?String(entry.feedCount):"—";
+$("pumpHint").textContent=state.mode==="live"?"Device reports 0=OFF, 1=ON":"Needs hardware telemetry";
+$("lightHint").textContent=state.mode==="live"?"Device reports 0=OFF, 1=ON":"Manual logs below";
+$("feederHint").textContent=state.mode==="live"?"Cumulative feed cycles":"Manual feeding log below";
+$("readingTime").textContent=entry?"Last recorded: "+fmt(entry.at)+(stale?" • sensor record is stale":""):"No measurement received yet.";
+$("provenanceChip").textContent=state.mode==="manual"?"MANUAL RECORDS":stale?"STALE SENSOR DATA":entry?"SENSOR TELEMETRY":"AWAITING SENSOR DATA";
+const label=state.mode==="manual"?"Manual entry mode":sensorError?"Sensor connection problem":entry&&fresh(entry.at)?"Sensor data received":entry?"Waiting for fresh readings":"No live data";
+$("connectionText").textContent=label;$("connectionDot").className="dot"+(state.mode==="live"?(entry&&fresh(entry.at)?" good":" bad"):"");
+renderAlerts(entry,stale);chart(arr);renderActivity();
+}
+function chart(arr){
+const vals=arr.filter(e=>e.temp!==null).slice(-25),root=$("chart");root.replaceChildren();
+if(!vals.length){const el=document.createElement("div");el.className="empty";el.textContent="No recorded temperature values yet.";root.appendChild(el);return}
+const NS="http://www.w3.org/2000/svg";const svg=document.createElementNS(NS,"svg");svg.setAttribute("viewBox","0 0 700 235");svg.setAttribute("role","img");svg.setAttribute("aria-label","Temperature trend chart of "+vals.length+" actual readings");
+const min=Math.min(...vals.map(v=>v.temp))-1,max=Math.max(...vals.map(v=>v.temp))+1;
+function node(t,attrs,text){const el=document.createElementNS(NS,t);for(const k in attrs)el.setAttribute(k,attrs[k]);if(text!==undefined)el.textContent=text;svg.appendChild(el);return el}
+for(let i=0;i<5;i++){const y=20+i*45;node("line",{x1:48,y1:y,x2:679,y2:y,stroke:"#d5e6ed","stroke-width":1});node("text",{x:4,y:y+4,fill:"#58788b","font-size":12},(max-(max-min)*i/4).toFixed(1))}
+const points=vals.map((v,i)=>[48+(vals.length===1?315:i*631/(vals.length-1)),20+(max-v.temp)/(max-min)*180]);
+node("polyline",{points:points.map(p=>p.join(",")).join(" "),fill:"none",stroke:"#168b8e","stroke-width":3,"stroke-linecap":"round","stroke-linejoin":"round"});
+points.forEach((p,i)=>{node("circle",{cx:p[0],cy:p[1],r:4,fill:"#1265a0"});if(i===0||i===points.length-1)node("text",{x:Math.max(52,Math.min(650,p[0]-20)),y:224,fill:"#597d8d","font-size":12},new Date(vals[i].at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}))});
+root.appendChild(svg);
+}
+function renderActivity(){
+const e=state.activities.slice(-3).reverse();$("activitySummary").textContent=e.length?e.map(x=>x.action+" • "+fmt(x.at)).join("   |   "):"No care activities recorded on this device.";
+}
+function saveAction(action){state.activities.push({at:new Date().toISOString(),action});state.activities=state.activities.slice(-100);persist();renderActivity()}
+$("fedBtn").addEventListener("click",()=>saveAction("Fish fed manually"));
+$("lightOnBtn").addEventListener("click",()=>saveAction("Grow light manually logged ON"));
+$("lightOffBtn").addEventListener("click",()=>saveAction("Grow light manually logged OFF"));
+$("entryForm").addEventListener("submit",e=>{
+e.preventDefault();
+if(state.mode==="live"){$("saveMessage").textContent="Switch to Manual measurements to enter data.";return}
+const raw=[["temp","tempInput",-5,60],["ph","phInput",0,14],["level","levelInput",0,100],["ammo","ammoInput",0,100],["nitrite","nitriteInput",0,100]];
+const item={at:new Date().toISOString()};
+for(const [k,id,min,max] of raw){const val=$(id).value.trim();if(val!==""&&num(val,min,max)===null){$("saveMessage").textContent="Please correct "+k+" measurement.";return}item[k]=num(val,min,max)}
+if(raw.every(([k])=>item[k]===null)){$("saveMessage").textContent="Enter at least one measurement.";return}
+state.manual.push(item);state.manual=state.manual.slice(-300);
+$("saveMessage").textContent=persist()?"Saved locally at "+fmt(item.at)+".":"Saved for this session; browser storage is unavailable.";
+$("entryForm").reset();updateAll()
+});
+$("manualModeBtn").addEventListener("click",()=>{state.mode="manual";persist();updateMode()});
+$("cloudModeBtn").addEventListener("click",()=>{state.mode="live";persist();updateMode();if(state.channel)startPolling()});
+$("connectBtn").addEventListener("click",()=>{const id=$("channelId").value.trim();if(!/^[0-9]{1,12}$/.test(id)){$("liveMessage").textContent="Enter a valid numeric public Channel ID.";return}state.channel=id;state.mode="live";cloudFeed=[];sensorError="";persist();updateMode();startPolling()});
+$("refreshBtn").addEventListener("click",()=>fetchCloud());
+$("disconnectBtn").addEventListener("click",()=>{state.channel="";cloudFeed=[];sensorError="";state.mode="manual";persist();updateMode()});
+async function fetchCloud(){
+if(!state.channel){$("liveMessage").textContent="Connect a public channel first.";return}
+if(loading)return;loading=true;$("liveMessage").textContent="Reading sensor feed...";
+const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+try{
+const u="https://api.thingspeak.com/channels/"+encodeURIComponent(state.channel)+"/feeds.json?results=40";
+const res=await fetch(u,{signal:controller.signal,cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);
+const obj=await res.json();if(!obj||!Array.isArray(obj.feeds))throw new Error("No public feed found");
+const rows=obj.feeds.filter(x=>x&&x.created_at).map(cloudEntry).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at));
+if(!rows.length)throw new Error("Channel has no sensor entries");
+cloudFeed=rows;sensorError="";
+$("liveMessage").textContent="Read "+rows.length+" entries. Latest: "+fmt(rows[rows.length-1].at);
+}catch(e){sensorError=String(e.message||e);$("liveMessage").textContent="Could not read channel: "+sensorError+". Check the public channel ID, network and browser access.";cloudFeed=[]}
+finally{loading=false;clearTimeout(timeout);updateAll()}
+}
+function startPolling(){if(pollTimer)clearInterval(pollTimer);fetchCloud();pollTimer=setInterval(()=>{if(state.mode==="live"&&state.channel)fetchCloud()},30000)}
+$("saveLimits").addEventListener("click",()=>{
+const n={minTemp:num($("minTemp").value,-5,60),maxTemp:num($("maxTemp").value,-5,60),minPh:num($("minPh").value,0,14),maxPh:num($("maxPh").value,0,14),minLevel:num($("minLevel").value,0,100)};
+if(Object.values(n).some(v=>v===null)||n.minTemp>=n.maxTemp||n.minPh>=n.maxPh){$("limitsMessage").textContent="Check your ranges: minimum must be less than maximum.";return}
+state.limits=n;persist();$("limitsMessage").textContent="Alert settings saved on this device.";updateAll()
+});
+for(const k of Object.keys(defaultLimits))$(k).value=state.limits[k];
+function csvEscape(x){return '"'+String(x??"").replace(/"/g,'""')+'"'}
+$("exportBtn").addEventListener("click",()=>{
+const rows=manualList();if(!rows.length){$("saveMessage").textContent="No manual records to export.";return}
+const data=["timestamp,temperature_c,ph,water_level_pct,ammonia_mg_l,nitrite_mg_l",...rows.map(x=>[x.at,x.temp,x.ph,x.level,x.ammo,x.nitrite].map(csvEscape).join(","))].join("\r\n");
+const blob=new Blob([data],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download="AquaSphere-measurements.csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)
+});
+$("clearData").addEventListener("click",()=>{if(!confirm("Delete all locally saved manual measurements and care logs from this browser?"))return;state.manual=[];state.activities=[];persist();$("saveMessage").textContent="Local records deleted.";updateAll()});
+function publicUrl(){const u=new URL(location.href);u.hash="";u.search="";if(state.channel)u.searchParams.set("channel",state.channel);return u.toString()}
+function updateQR(){
+const url=publicUrl();$("shareUrl").textContent=url;
+$("qrImage").src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data="+encodeURIComponent(url)
+}
+$("copyLink").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(publicUrl());$("shareMessage").textContent="Link copied."}catch(e){$("shareMessage").textContent="Select the URL shown above and copy it manually."}});
+$("openLink").addEventListener("click",()=>window.open(publicUrl(),"_blank","noopener,noreferrer"));
+const qp=new URLSearchParams(location.search).get("channel");if(qp&&/^[0-9]{1,12}$/.test(qp)){state.channel=qp;state.mode="live";persist()}
+updateMode();if(state.mode==="live"&&state.channel)startPolling();
+})();
+</script>
+</body></html>
